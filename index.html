@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de equivalencias</title>
+<meta name="description" content="Cambia un alimento de tu plan por otro con los mismos macros.">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ===== COLORES DE MARCA: cambia estos valores ===== */
+  --marca:#FFEB3B;
+  --marca-suave:#FFF8C2;
+  --tinta:#141414;
+  --fondo:#FAFAF7;
+  --linea:#E3E2D8;
+  --apagado:#5A594F;
+  --aviso:#A8460A;
+  --aviso-suave:#FDEBDD;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:400 16px/1.5 "Archivo",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 56px}
+.banda{background:var(--marca)}
+.banda-in{max-width:720px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;display:block}
+.usuario{color:var(--tinta);font-weight:800;font-size:18px;text-decoration:none;letter-spacing:-.01em}
+.usuario:hover{text-decoration:underline}
+h1{margin:10px 0 8px;font-size:clamp(30px,7vw,44px);line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.intro{margin:0 0 22px;color:var(--apagado);max-width:56ch}
+.panel{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:20px}
+.fila{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:620px){.fila.dos{grid-template-columns:1fr 200px}}
+.campo>span,legend{display:block;font-weight:600;font-size:14px;margin:0 0 6px;padding:0}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+select,input[type=number]{width:100%;height:48px;border:1px solid var(--linea);border-radius:10px;padding:0 12px;font:inherit;color:inherit;background:#fff}
+select:focus-visible,input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
+.stepper{display:flex;gap:6px}
+.stepper button{flex:0 0 48px;height:48px;border:0;border-radius:10px;background:var(--marca);color:var(--tinta);font-size:24px;font-weight:600;cursor:pointer}
+.stepper input{text-align:center;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:inline-block;padding:9px 14px;border:1px solid var(--linea);border-radius:999px;font-size:15px;background:#fff}
+.seg input:checked+span{background:var(--marca);border-color:var(--tinta);color:var(--tinta);font-weight:800}
+.seg input:focus-visible+span{outline:3px solid var(--tinta);outline-offset:2px}
+.resumen{margin:22px 0 0;padding:12px 14px;border-radius:10px;background:var(--marca-suave);border-left:5px solid var(--marca)}
+h2{margin:28px 0 4px;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.sub{margin:0 0 6px;color:var(--apagado);font-size:14px}
+ol{list-style:none;margin:0;padding:0}
+li{display:grid;grid-template-columns:104px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--linea)}
+.gr{font-size:30px;font-weight:800;line-height:1.1;color:var(--tinta);letter-spacing:-.02em}
+.gr b{background:linear-gradient(transparent 55%,var(--marca) 55%);font-weight:800}
+.gr small{font-size:15px;font-weight:600;margin-left:2px}
+.gr em{display:block;font-style:normal;font-size:13px;font-weight:400;color:var(--apagado);letter-spacing:0}
+.nom{font-weight:600}
+.mac{display:flex;flex-wrap:wrap;gap:2px 14px;color:var(--apagado);font-size:14px;margin-top:2px}
+.tag{display:inline-block;margin-top:6px;font-size:13px;padding:2px 9px;border-radius:999px;background:var(--marca-suave);color:var(--tinta)}
+.tag.aviso{background:var(--aviso-suave);color:var(--aviso)}
+.vacio{padding:18px 0;color:var(--apagado)}
+.nota{margin:26px 0 0;color:var(--apagado);font-size:13px;max-width:62ch}
+.cta{margin-top:32px;padding:22px;border-radius:14px;background:var(--tinta);color:#fff}
+.cta h2{margin:0 0 6px;color:var(--marca)}
+.cta p{margin:0 0 16px;color:#E8E8E0;max-width:52ch}
+.botones{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-block;padding:13px 20px;border-radius:10px;font-weight:800;text-decoration:none;background:var(--marca);color:var(--tinta)}
+.btn.sec{background:transparent;color:#fff;border:1px solid #fff}
+.btn:hover{filter:brightness(.93)}
+.cta a:focus-visible{outline-color:#fff}
+footer{margin-top:20px;font-size:14px}
+footer strong{font-weight:800}
+</style>
+</head>
+<body>
+<header class="banda"><div class="banda-in">
+  <img class="logo" src="logo.png" alt="Logo de @jordisarrio_coach">
+  <a class="usuario" id="usuario" href="#"></a>
+</div></header>
+<div class="wrap">
+  <h1 style="margin-top:0">Calculadora de equivalencias</h1>
+  <p class="intro">Cambia un alimento de tu plan por otro sin descuadrar la dieta. Elige lo que tienes, cuántos gramos y verás cuánto comer de las alternativas.</p>
+
+  <section class="panel" aria-label="Datos de tu plan">
+    <div class="fila dos">
+      <label class="campo"><span>Alimento de tu plan</span><select id="alimento"></select></label>
+      <div class="campo"><span id="lblcant">Cantidad (g)</span>
+        <div class="stepper">
+          <button type="button" id="menos" aria-label="Quitar 5 gramos">−</button>
+          <input id="cantidad" type="number" inputmode="numeric" min="5" max="2000" step="5" value="80" aria-labelledby="lblcant">
+          <button type="button" id="mas" aria-label="Añadir 5 gramos">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="fila" style="margin-top:16px">
+      <fieldset><legend>Igualar por</legend>
+        <div class="seg" id="modos">
+          <label><input type="radio" name="modo" value="auto" checked><span>Automático</span></label>
+          <label><input type="radio" name="modo" value="p"><span>Proteína</span></label>
+          <label><input type="radio" name="modo" value="c"><span>Hidratos</span></label>
+          <label><input type="radio" name="modo" value="f"><span>Grasa</span></label>
+          <label><input type="radio" name="modo" value="k"><span>Calorías</span></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Equivale a</legend>
+        <div class="seg" id="filtros">
+          <label><input type="radio" name="filtro" value="grupo" checked><span>Su grupo</span></label>
+          <label><input type="radio" name="filtro" value="todos"><span>Todos</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <p class="resumen" id="resumen" aria-live="polite"></p>
+  </section>
+
+  <h2>Alternativas</h2>
+  <p class="sub" id="sub">Arriba, los cambios que menos alteran el resto de macros.</p>
+  <ol id="lista"></ol>
+
+  <p class="nota">Valores orientativos por 100 g. Arroz, pasta, avena, quinoa, carnes y pescados en peso crudo; legumbres de bote escurridas. Las unidades (huevo, rebanada, tortita…) son aproximadas. Una etiqueta naranja indica que ese cambio altera bastante otro macro: úsalo de vez en cuando. Si tu plan o tu asesor indican otra cosa, manda el plan.</p>
+  <section class="cta" aria-label="Contacto">
+    <h2>¿Quieres un plan hecho para ti?</h2>
+    <p>Te preparo una planificación de entrenamiento y nutrición adaptada a tu día a día. Escríbeme y te cuento cómo trabajo.</p>
+    <div class="botones">
+      <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Pedir información por WhatsApp</a>
+      <a class="btn sec" id="ig" href="#" target="_blank" rel="noopener">Ver mi Instagram</a>
+    </div>
+  </section>
+  <footer><strong id="nombre"></strong> <span id="oficio"></span></footer>
+</div>
+
+<script>
+/* ===== DATOS DE MARCA: cambia estos textos ===== */
+const MARCA={
+  nombre:"@jordisarrio_coach",
+  oficio:"Asesoría online de fuerza y nutrición",
+  usuario:"@jordisarrio_coach",
+  instagram:"https://www.instagram.com/jordisarrio_coach/",
+  whatsapp:"https://api.whatsapp.com/send?phone=34634316136&text=%C2%A1Hola!%20%F0%9F%91%8B%20Me%20interesa%20conocer%20m%C3%A1s%20sobre%20como%20trabajar%20contigo.%20Me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n%20sobre%20tu%20forma%20de%20trabajo%2C%20los%20requisitos%20y%20c%C3%B3mo%20puedo%20empezar.%20%C2%A1Quedo%20atento%2Fa%20a%20tu%20respuesta!%20Muchas%20gracias."
+};
+
+/* Grupos y macro con el que se iguala en modo Automático */
+const GRUPOS={prot:{n:"Proteínas",m:"p"},hid:{n:"Hidratos",m:"c"},fru:{n:"Fruta",m:"c"},gra:{n:"Grasas",m:"f"},lac:{n:"Lácteos",m:"p"}};
+
+/* [nombre, grupo, proteína, hidratos, grasa (por 100 g), [unidad, plural, gramos por unidad]] */
+const RAW=[
+["Pechuga de pollo (cruda)","prot",23,0,1.5],["Pechuga de pavo (cruda)","prot",24,0,1],["Ternera magra (cruda)","prot",21,0,5],
+["Lomo de cerdo (crudo)","prot",21,0,6],["Merluza (cruda)","prot",17,0,1],["Bacalao fresco (crudo)","prot",18,0,0.7],
+["Salmón (crudo)","prot",20,0,13],["Atún al natural (escurrido)","prot",25,0,1],["Langostinos (crudos)","prot",18,0,1],
+["Huevo entero","prot",12.5,0.7,10,["huevo","huevos",55]],["Claras de huevo","prot",11,0.7,0.2,["clara","claras",33]],
+["Jamón cocido extra","prot",18,1,3],["Fiambre de pavo","prot",17,2,2],["Tofu firme","prot",13,2,7],["Tempeh","prot",19,9,11],
+["Proteína whey en polvo","prot",80,6,6,["scoop","scoops",30]],
+["Arroz (crudo)","hid",7,79,0.7],["Pasta (cruda)","hid",12,72,1.5],["Avena (copos)","hid",13,59,7],["Quinoa (cruda)","hid",14,64,6],
+["Cuscús (crudo)","hid",12,73,1.5],["Patata (cruda)","hid",2,17,0.1],["Boniato (crudo)","hid",1.6,20,0.1],
+["Pan integral","hid",9,43,3,["rebanada","rebanadas",30]],["Pan blanco","hid",9,52,2,["rebanada","rebanadas",30]],
+["Tortitas de arroz","hid",8,82,3,["tortita","tortitas",9]],["Lentejas (bote, escurridas)","hid",8,15,0.6],
+["Garbanzos (bote, escurridos)","hid",7.5,18,2.5],["Alubias (bote, escurridas)","hid",7,14,0.6],
+["Plátano","fru",1,20,0.3,["plátano","plátanos",100]],["Manzana","fru",0.3,12,0.2,["manzana","manzanas",170]],
+["Naranja","fru",0.9,10,0.2,["naranja","naranjas",150]],["Pera","fru",0.4,13,0.1,["pera","peras",170]],
+["Kiwi","fru",1.1,13,0.5,["kiwi","kiwis",80]],["Fresas","fru",0.7,6,0.3],["Arándanos","fru",0.7,13,0.3],
+["Uvas","fru",0.7,17,0.2],["Piña","fru",0.5,12,0.1],
+["Aceite de oliva","gra",0,0,100,["cucharada","cucharadas",10]],["Aguacate","gra",2,2,15],["Almendras","gra",21,6,51],
+["Nueces","gra",15,7,65],["Cacahuetes","gra",26,10,49],["Pistachos","gra",20,18,45],["Anacardos","gra",18,30,44],
+["Crema de cacahuete","gra",25,12,50,["cucharada","cucharadas",15]],["Queso curado","gra",28,0.5,33],
+["Chocolate negro 85%","gra",10,20,50,["onza","onzas",10]],["Semillas de chía","gra",17,8,31],
+["Yogur griego 0%","lac",10,4,0.2,["yogur","yogures",125]],["Skyr","lac",11,4,0.2,["tarrina","tarrinas",150]],
+["Queso fresco batido 0%","lac",8,4,0.2],["Queso cottage","lac",11,3.4,4.3],["Yogur natural","lac",4.5,5,3,["yogur","yogures",125]],
+["Leche semidesnatada","lac",3.3,4.8,1.6],["Bebida de soja sin azúcar","lac",3.3,0.6,1.8]
+];
+const FOODS=RAW.map(([n,g,p,c,f,u])=>({n,g,p,c,f,u,k:4*p+4*c+9*f}));
+const ETIQ={p:"proteína",c:"hidratos",f:"grasa"};
+const nf=new Intl.NumberFormat("es-ES",{maximumFractionDigits:1});
+const $=s=>document.querySelector(s);
+const sel=$("#alimento"),qty=$("#cantidad");
+
+/* Marca */
+document.title=MARCA.nombre+" · Calculadora de equivalencias";
+$("#usuario").textContent=MARCA.usuario;$("#usuario").href=MARCA.instagram;$("#ig").href=MARCA.instagram;$("#wa").href=MARCA.whatsapp;
+$("#nombre").textContent=MARCA.nombre;$("#oficio").textContent=MARCA.oficio;
+
+/* Selector agrupado */
+Object.entries(GRUPOS).forEach(([k,gr])=>{
+  const og=document.createElement("optgroup");og.label=gr.n;
+  FOODS.forEach((f,i)=>{if(f.g===k)og.appendChild(new Option(f.n,i))});
+  sel.appendChild(og);
+});
+sel.value=FOODS.findIndex(f=>f.n==="Arroz (crudo)");
+
+const mac=(f,g)=>({p:f.p*g/100,c:f.c*g/100,f:f.f*g/100,k:f.k*g/100});
+const val=name=>document.querySelector(`input[name=${name}]:checked`).value;
+
+function render(){
+  let g=parseFloat(qty.value);
+  if(!(g>0))g=0;
+  g=Math.min(g,2000);
+  const src=FOODS[sel.value],S=mac(src,g);
+  const modo=val("modo")==="auto"?GRUPOS[src.g].m:val("modo");
+  const filtro=val("filtro");
+  $("#resumen").textContent=g?`${nf.format(g)} g de ${src.n.toLowerCase()} aportan ${nf.format(S.p)} g de proteína, ${nf.format(S.c)} g de hidratos, ${nf.format(S.f)} g de grasa y ${Math.round(S.k)} kcal.`:"Indica una cantidad para ver las alternativas.";
+  const out=[];
+  if(g){
+    FOODS.forEach(t=>{
+      if(t===src||(filtro==="grupo"&&t.g!==src.g))return;
+      const per=t[modo];
+      if(per<(modo==="k"?20:2))return;
+      let gt=S[modo]/per*100;
+      gt=gt<20?Math.round(gt):Math.round(gt/5)*5;
+      if(gt<3||gt>1000)return;
+      const T=mac(t,gt);
+      const d=[["p",T.p-S.p,4],["c",T.c-S.c,4],["f",T.f-S.f,9]];
+      const dev=d.reduce((a,x)=>a+Math.abs(x[1])*x[2],0)/Math.max(S.k,40);
+      const top=d.slice().sort((a,b)=>Math.abs(b[1]*b[2])-Math.abs(a[1]*a[2]))[0];
+      out.push({t,gt,T,dev,top});
+    });
+    out.sort((a,b)=>a.dev-b.dev);
+  }
+  $("#sub").textContent=out.length?`${out.length} alternativas. Arriba, los cambios que menos alteran el resto de macros.`:"";
+  $("#lista").innerHTML=out.length?out.map(r=>{
+    const u=r.t.u;let un="";
+    if(u){const x=Math.round(r.gt/u[2]*2)/2;if(x>=0.5)un=`<em>≈ ${nf.format(x)} ${x===1?u[0]:u[1]}</em>`}
+    const [m,dv]=r.top;
+    const tag=r.dev<0.12?`<span class="tag">Muy parecido</span>`:
+      `<span class="tag${r.dev>0.3?" aviso":""}">${dv>0?"+":"−"}${nf.format(Math.abs(dv))} g de ${ETIQ[m]}</span>`;
+    return `<li><div class="gr"><b>${r.gt}</b><small>g</small>${un}</div><div><div class="nom">${r.t.n}</div>
+      <div class="mac"><span>${nf.format(r.T.p)} g prot.</span><span>${nf.format(r.T.c)} g hidr.</span><span>${nf.format(r.T.f)} g grasa</span><span>${Math.round(r.T.k)} kcal</span></div>${tag}</div></li>`;
+  }).join(""):(g?`<li class="vacio" style="display:block">No hay alimentos que encajen con estos filtros. Prueba con «Todos» o con otro macro.</li>`:"");
+}
+
+function paso(n){const v=(parseFloat(qty.value)||0)+n;qty.value=Math.max(5,Math.min(2000,v));render()}
+$("#menos").onclick=()=>paso(-5);$("#mas").onclick=()=>paso(5);
+sel.addEventListener("change",render);qty.addEventListener("input",render);
+document.querySelectorAll("input[type=radio]").forEach(r=>r.addEventListener("change",render));
+render();
+</script>
+</body>
+</html>
